@@ -3,6 +3,7 @@ import { Lock, Plus, Minus, Check } from 'lucide-react';
 import heroImg from '../../assets/hero-desktop.webp';
 import blackImg from '../../assets/black-color.png';
 import beigeImg from '../../assets/beige-color.png';
+import blueImg from '../../assets/blue-color.png';
 
 type ProductVariant = {
   id: string;
@@ -14,7 +15,7 @@ type ProductVariant = {
 
 const productVariants: ProductVariant[] = [
   { id: 'black', name: 'Canvas Travel Bag - Black', colorCode: '#111827', image: blackImg, price: 1350 },
-  { id: 'blue', name: 'Canvas Travel Bag - Blue', colorCode: '#3b82f6', image: heroImg, price: 1350 },
+  { id: 'blue', name: 'Canvas Travel Bag - Blue', colorCode: '#3b82f6', image: blueImg, price: 1350 },
   { id: 'beige', name: 'Canvas Travel Bag - Beige', colorCode: '#e8dbce', image: beigeImg, price: 1350 },
 ];
 

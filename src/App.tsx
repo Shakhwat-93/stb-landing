@@ -3,6 +3,7 @@ import Header from './components/Header';
 import Hero from './components/Hero';
 import ProblemSolution from './components/ProblemSolution';
 import Features from './components/Features';
+import ProductGallery from './components/ProductGallery';
 import CheckoutForm from './components/CheckoutForm';
 import Footer from './components/Footer';
 import FloatingCallButton from './components/FloatingCallButton';
@@ -17,6 +18,7 @@ function App() {
         <Hero />
         <ProblemSolution />
         <Features />
+        <ProductGallery />
         <CheckoutForm />
       </main>
       <Footer />

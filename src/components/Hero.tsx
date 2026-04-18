@@ -1,7 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import heroImg from '../../assets/hero-desktop.webp';
-import heroMobileImg from '../../assets/hero-mobile.webp';
 import { ArrowRight, PlaneTakeoff, ShieldCheck } from 'lucide-react';
 
 const Hero = () => {
@@ -19,7 +18,6 @@ const Hero = () => {
         className="w-full"
       >
         <picture>
-          <source media="(max-width: 767px)" srcSet={heroMobileImg} />
           <source media="(min-width: 768px)" srcSet={heroImg} />
           <img 
             src={heroImg} 
