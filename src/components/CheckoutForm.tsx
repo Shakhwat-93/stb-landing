@@ -126,6 +126,26 @@ const CheckoutForm = ({ onSuccess }: { onSuccess?: () => void }) => {
 
       if (error) throw error;
       
+      // Push GA4 ecommerce purchase event
+      const w = window as any;
+      w.dataLayer = w.dataLayer || [];
+      w.dataLayer.push({
+        event: "purchase",
+        ecommerce: {
+          transaction_id: orderId,
+          value: total,
+          currency: "BDT",
+          items: orderedItemsJson.map(item => ({
+            item_name: item.name,
+            price: item.price,
+            quantity: item.quantity
+          }))
+        },
+        customer_name: name,
+        customer_phone: phone,
+        customer_address: address
+      });
+
       localStorage.setItem('last_order_time', Date.now().toString());
       if (onSuccess) onSuccess();
     } catch (error) {
