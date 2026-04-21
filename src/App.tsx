@@ -8,7 +8,6 @@ import CheckoutForm from './components/CheckoutForm';
 import Footer from './components/Footer';
 import FloatingCallButton from './components/FloatingCallButton';
 import AnnouncementBar from './components/AnnouncementBar';
-import PopupOffer from './components/PopupOffer';
 
 function App() {
   const [isOrderSuccess, setIsOrderSuccess] = React.useState(false);
@@ -65,7 +64,6 @@ function App() {
         <CheckoutForm onSuccess={() => setIsOrderSuccess(true)} />
       </main>
       <Footer />
-      <PopupOffer />
       <FloatingCallButton />
     </div>
   );
