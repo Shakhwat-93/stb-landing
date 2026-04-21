@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Lock, Plus, Minus, Check } from 'lucide-react';
 import heroImg from '../../assets/hero-desktop.webp';
-import blackImg from '../../assets/black-color.png';
-import beigeImg from '../../assets/beige-color.png';
-import blueImg from '../../assets/blue-color.png';
+import blackImg from '../../assets/black-color.webp';
+import beigeImg from '../../assets/beige-color.webp';
+import blueImg from '../../assets/blue-color.webp';
 
 type ProductVariant = {
   id: string;
@@ -228,18 +228,18 @@ const CheckoutForm = () => {
                {/* Shipping Options */}
                <div className="space-y-3 mb-6 pb-6 border-b border-gray-200">
                  <label className="flex items-center justify-between cursor-pointer group">
-                   <span className="text-sm text-gray-800 whitespace-nowrap">ঢাকার বাইরে ডেলিভারি চার্জ: <span className="font-bold text-teal-600">130.00৳</span></span>
+                    <span className="text-sm text-gray-800">ঢাকার বাইরে ডেলিভারি চার্জ: <span className="font-bold text-teal-600">130.00৳</span></span>
                    <input 
                      type="radio" 
                      name="shipping" 
                      value={130}
                      checked={shippingCost === 130}
                      onChange={() => setShippingCost(130)}
-                     className="w-4 h-4 text-accent border-gray-300 focus:ring-accent accent-purple-600 cursor-pointer"
+                     className="w-4 h-4 ml-2 text-accent border-gray-300 focus:ring-accent accent-purple-600 cursor-pointer"
                    />
                  </label>
                  <label className="flex items-center justify-between cursor-pointer group">
-                   <span className="text-sm text-gray-800 whitespace-nowrap">ঢাকার ভিতরে ডেলিভারি চার্জ: <span className="font-bold text-teal-600">60.00৳</span></span>
+                    <span className="text-sm text-gray-800">ঢাকার ভিতরে ডেলিভারি চার্জ: <span className="font-bold text-teal-600">60.00৳</span></span>
                    <input 
                      type="radio" 
                      name="shipping" 

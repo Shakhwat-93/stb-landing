@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import heroImg from '../../assets/hero-desktop.webp';
+import heroMobileImg from '../../assets/hero-mobile.webp';
 import { ArrowRight, PlaneTakeoff, ShieldCheck } from 'lucide-react';
 
 const Hero = () => {
@@ -20,7 +21,7 @@ const Hero = () => {
         <picture>
           <source media="(min-width: 768px)" srcSet={heroImg} />
           <img 
-            src={heroImg} 
+            src={heroMobileImg} 
             alt="Canvas Travel Bag" 
             className="w-full h-auto object-cover min-h-[300px] md:min-h-[500px] lg:min-h-screen"
           />
@@ -45,7 +46,7 @@ const Hero = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
-            className="text-3xl md:text-5xl font-extrabold text-gray-900 leading-tight"
+            className="text-2xl sm:text-3xl md:text-5xl font-extrabold text-gray-900 leading-tight break-words"
           >
             Canvas Travel Bag – <br className="hidden md:block" />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-orange-500">

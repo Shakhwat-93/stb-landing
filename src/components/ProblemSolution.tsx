@@ -23,7 +23,7 @@ const ProblemSolution = () => {
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="bg-white p-8 rounded-2xl shadow-sm border border-red-100 relative overflow-hidden"
+            className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-red-100 relative overflow-hidden"
           >
             <div className="absolute top-0 left-0 w-1 h-full bg-red-400"></div>
             <div className="flex items-center gap-3 mb-6">
@@ -53,7 +53,7 @@ const ProblemSolution = () => {
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="bg-white p-8 rounded-2xl shadow-lg border border-green-100 relative overflow-hidden"
+            className="bg-white p-6 md:p-8 rounded-2xl shadow-lg border border-green-100 relative overflow-hidden"
           >
             <div className="absolute top-0 left-0 w-1 h-full bg-accent"></div>
             <div className="flex items-center gap-3 mb-6">

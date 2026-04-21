@@ -1,8 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import blackImg from '../../assets/black-color.png';
-import blueImg from '../../assets/blue-color.png';
-import beigeImg from '../../assets/beige-color.png';
+import blackImg from '../../assets/black-color.webp';
+import blueImg from '../../assets/blue-color.webp';
+import beigeImg from '../../assets/beige-color.webp';
 
 const images = [blackImg, blueImg, beigeImg];
 

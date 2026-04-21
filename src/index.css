@@ -3,7 +3,8 @@
 @tailwind utilities;
 
 @layer base {
-  html {
+  html, body {
+    @apply overflow-x-hidden w-full;
     font-family: 'Inter', 'Noto Sans Bengali', sans-serif;
   }
 }
