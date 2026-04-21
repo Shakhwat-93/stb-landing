@@ -20,9 +20,9 @@ const productVariants: ProductVariant[] = [
   { id: 'beige', name: 'Canvas Travel Bag - Beige', colorCode: '#e8dbce', image: beigeImg, price: 1350 },
 ];
 
-const CheckoutForm = () => {
+const CheckoutForm = ({ onSuccess }: { onSuccess?: () => void }) => {
   const [shippingCost, setShippingCost] = useState<number>(60);
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [showLimitModal, setShowLimitModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   const [name, setName] = useState('');
@@ -66,9 +66,39 @@ const CheckoutForm = () => {
       return;
     }
     
+    // Validate BD Phone Number
+    const bdPhoneRegex = /^01[3-9]\d{8}$/;
+    if (!bdPhoneRegex.test(phone)) {
+      alert("দয়া করে সঠিক ১১ ডিজিটের বাংলাদেশী মোবাইল নাম্বার দিন (যেমন: 017XXXXXXXX)।");
+      return;
+    }
+    
     setIsSubmitting(true);
     
     try {
+      // Rate Limit Check
+      if (phone !== '01315183993') {
+        const threeHoursAgo = new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString();
+        
+        // Check DB for recent orders with the same phone
+        const { data: recentOrders } = await supabase
+          .from('orders')
+          .select('id')
+          .eq('phone', phone)
+          .gte('created_at', threeHoursAgo)
+          .limit(1);
+
+        // Check local storage for recent orders from the same device
+        const lastOrderTime = localStorage.getItem('last_order_time');
+        const isRateLimitedByStorage = lastOrderTime && (Date.now() - parseInt(lastOrderTime)) < 3 * 60 * 60 * 1000;
+
+        if ((recentOrders && recentOrders.length > 0) || isRateLimitedByStorage) {
+           setShowLimitModal(true);
+           setIsSubmitting(false);
+           return;
+        }
+      }
+
       const totalItems = selectedItems.reduce((sum, item) => sum + cart[item.id], 0);
       const orderedItemsJson = selectedItems.map(item => ({
         name: item.name,
@@ -96,7 +126,8 @@ const CheckoutForm = () => {
 
       if (error) throw error;
       
-      setIsSubmitted(true);
+      localStorage.setItem('last_order_time', Date.now().toString());
+      if (onSuccess) onSuccess();
     } catch (error) {
       console.error("Error submitting order:", error);
       alert("অর্ডার সাবমিট করতে সমস্যা হচ্ছে। দয়া করে আবার চেষ্টা করুন বা আমাদের কল করুন।");
@@ -105,22 +136,30 @@ const CheckoutForm = () => {
     }
   };
 
-  if (isSubmitted) {
-    return (
-      <section id="checkout-form" className="py-20 bg-gray-50 flex items-center justify-center">
-        <div className="bg-white p-10 rounded-xl shadow-sm text-center max-w-lg border border-gray-100">
-          <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
-          </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">অর্ডার সফল হয়েছে!</h2>
-          <p className="text-gray-600">খুব দ্রুত আমাদের প্রতিনিধি আপনাকে কল করে অর্ডারটি কনফার্ম করবে।</p>
-        </div>
-      </section>
-    );
-  }
-
   return (
-    <section id="checkout-form" className="py-16 bg-white border-t border-gray-100">
+    <section id="checkout-form" className="py-16 bg-white border-t border-gray-100 relative">
+      
+      {/* Rate Limit Warning Modal */}
+      {showLimitModal && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full text-center">
+            <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">অর্ডার লিমিট অতিক্রম করেছে!</h3>
+            <p className="text-gray-600 mb-6 text-sm">
+              আপনি ইতিমধ্যেই একটি অর্ডার প্লেস করেছেন। স্প্যাম রোধ করতে, দয়া করে ৩ ঘণ্টা পর আবার চেষ্টা করুন।
+            </p>
+            <button 
+              onClick={() => setShowLimitModal(false)}
+              className="bg-gray-900 text-white font-bold py-3 px-8 rounded-md w-full hover:bg-gray-800 transition-colors"
+            >
+              বন্ধ করুন
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="max-w-5xl mx-auto px-4">
         <form onSubmit={handleSubmit}>
           
