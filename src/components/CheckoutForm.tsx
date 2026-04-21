@@ -4,6 +4,7 @@ import heroImg from '../../assets/hero-desktop.webp';
 import blackImg from '../../assets/black-color.webp';
 import beigeImg from '../../assets/beige-color.webp';
 import blueImg from '../../assets/blue-color.webp';
+import { supabase } from '../lib/supabase';
 
 type ProductVariant = {
   id: string;
@@ -22,6 +23,11 @@ const productVariants: ProductVariant[] = [
 const CheckoutForm = () => {
   const [shippingCost, setShippingCost] = useState<number>(60);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const [name, setName] = useState('');
+  const [address, setAddress] = useState('');
+  const [phone, setPhone] = useState('');
   
   // State for cart: variant id -> quantity
   const [cart, setCart] = useState<Record<string, number>>({
@@ -53,13 +59,50 @@ const CheckoutForm = () => {
   const productSubtotal = selectedItems.reduce((sum, item) => sum + (item.price * cart[item.id]), 0);
   const total = productSubtotal + shippingCost;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (selectedItems.length === 0) {
       alert("Please select at least one product.");
       return;
     }
-    setIsSubmitted(true);
+    
+    setIsSubmitting(true);
+    
+    try {
+      const totalItems = selectedItems.reduce((sum, item) => sum + cart[item.id], 0);
+      const orderedItemsJson = selectedItems.map(item => ({
+        name: item.name,
+        quantity: cart[item.id],
+        price: item.price
+      }));
+      
+      const orderId = `STB-${Math.floor(100000 + Math.random() * 900000)}`;
+
+      const { error } = await supabase.from('orders').insert([
+        {
+          id: orderId,
+          customer_name: name,
+          phone: phone,
+          address: address,
+          product_name: "Canvas Travel Bag",
+          ordered_items: orderedItemsJson,
+          amount: total,
+          items: totalItems,
+          shipping_zone: shippingCost === 130 ? 'Outside dhaka' : 'Inside dhaka',
+          source: 'stb-landing',
+          status: 'New'
+        }
+      ]);
+
+      if (error) throw error;
+      
+      setIsSubmitted(true);
+    } catch (error) {
+      console.error("Error submitting order:", error);
+      alert("অর্ডার সাবমিট করতে সমস্যা হচ্ছে। দয়া করে আবার চেষ্টা করুন বা আমাদের কল করুন।");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (isSubmitted) {
@@ -157,6 +200,8 @@ const CheckoutForm = () => {
                   <input 
                     required 
                     type="text" 
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
                     placeholder="e.g. Hasan Mahmud" 
                     className="w-full px-4 py-3 bg-white border border-gray-300 rounded focus:ring-1 focus:ring-gray-400 focus:border-gray-400 outline-none transition-colors" 
                   />
@@ -169,6 +214,8 @@ const CheckoutForm = () => {
                   <input 
                     required 
                     type="text" 
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
                     placeholder="e.g. House 12, Road 4, Dhanmondi, Dhaka" 
                     className="w-full px-4 py-3 bg-white border border-gray-300 rounded focus:ring-1 focus:ring-gray-400 focus:border-gray-400 outline-none transition-colors" 
                   />
@@ -181,6 +228,8 @@ const CheckoutForm = () => {
                   <input 
                     required 
                     type="tel" 
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
                     placeholder="01XXXXXXXXX" 
                     className="w-full px-4 py-3 bg-white border border-gray-300 rounded focus:ring-1 focus:ring-gray-400 focus:border-gray-400 outline-none transition-colors" 
                   />
@@ -260,11 +309,11 @@ const CheckoutForm = () => {
                {/* Submit Button */}
                <button 
                  type="submit" 
-                 disabled={selectedItems.length === 0}
+                 disabled={selectedItems.length === 0 || isSubmitting}
                  className="w-full bg-[#cc0000] hover:bg-[#a30000] disabled:bg-gray-400 text-white font-bold py-4 rounded-md shadow transition-colors flex justify-center items-center gap-2 mb-4"
                >
                  <Lock size={18} />
-                 <span className="text-lg">অর্ডার কনফার্ম করুন</span>
+                 <span className="text-lg">{isSubmitting ? 'প্রসেসিং...' : 'অর্ডার কনফার্ম করুন'}</span>
                </button>
 
                {/* Contact Info Footer */}
