@@ -7,10 +7,10 @@ const PopupOffer = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    // Show pop-up after 1.5 seconds of page load
+    // Show pop-up after 10 seconds of page load
     const timer = setTimeout(() => {
       setIsOpen(true);
-    }, 1500);
+    }, 10000);
 
     return () => clearTimeout(timer);
   }, []);
