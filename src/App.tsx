@@ -13,6 +13,26 @@ import PopupOffer from './components/PopupOffer';
 function App() {
   const [isOrderSuccess, setIsOrderSuccess] = React.useState(false);
 
+  React.useEffect(() => {
+    // Push GA4 view_item event on page load
+    const w = window as any;
+    w.dataLayer = w.dataLayer || [];
+    w.dataLayer.push({
+      event: "view_item",
+      ecommerce: {
+        currency: "BDT",
+        value: 1350,
+        items: [
+          {
+            item_name: "Canvas Travel Bag",
+            price: 1350,
+            quantity: 1
+          }
+        ]
+      }
+    });
+  }, []);
+
   if (isOrderSuccess) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center font-sans px-4">
