@@ -12,12 +12,13 @@ type ProductVariant = {
   colorCode: string;
   image: string;
   price: number;
+  inStock: boolean;
 };
 
 const productVariants: ProductVariant[] = [
-  { id: 'black', name: 'Canvas Travel Bag - Black', colorCode: '#111827', image: blackImg, price: 1350 },
-  { id: 'blue', name: 'Canvas Travel Bag - Blue', colorCode: '#3b82f6', image: blueImg, price: 1350 },
-  { id: 'beige', name: 'Canvas Travel Bag - Beige', colorCode: '#e8dbce', image: beigeImg, price: 1350 },
+  { id: 'black', name: 'Canvas Travel Bag - Black', colorCode: '#111827', image: blackImg, price: 1350, inStock: true },
+  { id: 'blue', name: 'Canvas Travel Bag - Blue', colorCode: '#3b82f6', image: blueImg, price: 1350, inStock: false },
+  { id: 'beige', name: 'Canvas Travel Bag - Beige', colorCode: '#e8dbce', image: beigeImg, price: 1350, inStock: true },
 ];
 
 const CheckoutForm = ({ onSuccess }: { onSuccess?: () => void }) => {
@@ -35,6 +36,9 @@ const CheckoutForm = ({ onSuccess }: { onSuccess?: () => void }) => {
   });
 
   const handleToggleVariant = (id: string) => {
+    const variant = productVariants.find(item => item.id === id);
+    if (!variant?.inStock) return;
+
     setCart(prev => {
       const newCart = { ...prev };
       if (newCart[id]) {
@@ -47,6 +51,9 @@ const CheckoutForm = ({ onSuccess }: { onSuccess?: () => void }) => {
   };
 
   const handleUpdateQuantity = (id: string, delta: number) => {
+    const variant = productVariants.find(item => item.id === id);
+    if (!variant?.inStock) return;
+
     setCart(prev => {
       const currentQty = prev[id] || 0;
       const newQty = currentQty + delta;
@@ -55,7 +62,7 @@ const CheckoutForm = ({ onSuccess }: { onSuccess?: () => void }) => {
     });
   };
 
-  const selectedItems = productVariants.filter(v => cart[v.id]);
+  const selectedItems = productVariants.filter(v => v.inStock && cart[v.id]);
   const productSubtotal = selectedItems.reduce((sum, item) => sum + (item.price * cart[item.id]), 0);
   const total = productSubtotal + shippingCost;
 
@@ -190,46 +197,68 @@ const CheckoutForm = ({ onSuccess }: { onSuccess?: () => void }) => {
               {productVariants.map(variant => {
                 const isSelected = !!cart[variant.id];
                 const qty = cart[variant.id] || 0;
+                const isOutOfStock = !variant.inStock;
 
                 return (
                   <div 
                     key={variant.id}
-                    className={`flex items-center p-4 rounded-xl border transition-all ${isSelected ? 'border-red-400 bg-red-50/30' : 'border-gray-200 bg-white hover:border-gray-300'}`}
+                    className={`flex items-center p-4 rounded-xl border transition-all ${
+                      isOutOfStock
+                        ? 'border-gray-200 bg-gray-50 opacity-75'
+                        : isSelected
+                          ? 'border-red-400 bg-red-50/30'
+                          : 'border-gray-200 bg-white hover:border-gray-300'
+                    }`}
                   >
                     {/* Checkbox */}
                     <div 
                       onClick={() => handleToggleVariant(variant.id)}
-                      className="cursor-pointer mr-4"
+                      className={`mr-4 ${isOutOfStock ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+                      aria-disabled={isOutOfStock}
                     >
-                      <div className={`w-6 h-6 rounded flex items-center justify-center border ${isSelected ? 'bg-blue-800 border-blue-800 text-white' : 'border-gray-300 bg-white'}`}>
+                      <div className={`w-6 h-6 rounded flex items-center justify-center border ${
+                        isOutOfStock
+                          ? 'border-gray-300 bg-gray-100'
+                          : isSelected
+                            ? 'bg-blue-800 border-blue-800 text-white'
+                            : 'border-gray-300 bg-white'
+                      }`}>
                         {isSelected && <Check size={16} strokeWidth={3} />}
                       </div>
                     </div>
 
                     {/* Product Image */}
-                    <div className="w-16 h-16 rounded-md shadow-sm mr-4 flex-shrink-0 border border-gray-100 overflow-hidden bg-gray-50">
-                      <img src={variant.image} alt={variant.name} className="w-full h-full object-cover" />
+                    <div className="w-16 h-16 rounded-md shadow-sm mr-4 flex-shrink-0 border border-gray-100 overflow-hidden bg-gray-50 relative">
+                      <img src={variant.image} alt={variant.name} className={`w-full h-full object-cover ${isOutOfStock ? 'grayscale' : ''}`} />
+                      {isOutOfStock && <div className="absolute inset-0 bg-white/35" />}
                     </div>
 
                     {/* Details */}
                     <div className="flex-1">
-                      <h4 className="text-sm text-gray-800 font-medium mb-2">{variant.name}</h4>
+                      <div className="flex items-start justify-between gap-3 mb-2">
+                        <h4 className={`text-sm font-medium ${isOutOfStock ? 'text-gray-500' : 'text-gray-800'}`}>{variant.name}</h4>
+                        {isOutOfStock && (
+                          <span className="shrink-0 rounded-full bg-red-50 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-red-600 border border-red-100">
+                            Stock out
+                          </span>
+                        )}
+                      </div>
                       <div className="flex items-center gap-4">
                         {/* Qty Controls */}
                         <div className="flex items-center border border-gray-200 rounded-md bg-white">
                           <button 
                             type="button"
                             onClick={() => handleUpdateQuantity(variant.id, -1)}
-                            disabled={!isSelected}
+                            disabled={!isSelected || isOutOfStock}
                             className="w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-gray-50 disabled:opacity-50"
                           >
                             <Minus size={14} />
                           </button>
-                          <span className="w-8 text-center text-sm font-medium">{isSelected ? qty : 1}</span>
+                          <span className={`w-8 text-center text-sm font-medium ${isOutOfStock ? 'text-gray-400' : 'text-gray-900'}`}>{isSelected ? qty : 1}</span>
                           <button 
                             type="button"
                             onClick={() => handleUpdateQuantity(variant.id, 1)}
-                            disabled={!isSelected}
+                            disabled={!isSelected || isOutOfStock}
                             className="w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-gray-50 disabled:opacity-50"
                           >
                             <Plus size={14} />
