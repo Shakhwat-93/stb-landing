@@ -6,6 +6,71 @@ import beigeImg from '../../assets/beige-color.webp';
 import blueImg from '../../assets/blue-color.webp';
 import { supabase } from '../lib/supabase';
 
+/**
+ * Detects the traffic source from URL params + document.referrer.
+ * Priority: UTM params > Platform click IDs > Referrer domain > "Direct"
+ */
+function detectTrafficSource(): string {
+  const params = new URLSearchParams(window.location.search);
+  const referrer = document.referrer.toLowerCase();
+
+  // 1. Check explicit utm_source (most reliable — set in ad campaigns)
+  const utmSource = params.get('utm_source')?.toLowerCase();
+  if (utmSource) {
+    const sourceMap: Record<string, string> = {
+      facebook: 'Facebook',
+      fb: 'Facebook',
+      instagram: 'Instagram',
+      ig: 'Instagram',
+      tiktok: 'TikTok',
+      google: 'Google',
+      youtube: 'YouTube',
+      yt: 'YouTube',
+      twitter: 'Twitter/X',
+      x: 'Twitter/X',
+      linkedin: 'LinkedIn',
+      whatsapp: 'WhatsApp',
+      messenger: 'Messenger',
+    };
+    return sourceMap[utmSource] || utmSource.charAt(0).toUpperCase() + utmSource.slice(1);
+  }
+
+  // 2. Check platform-specific click ID params (auto-appended by ad platforms)
+  if (params.has('fbclid')) return 'Facebook';
+  if (params.has('gclid')) return 'Google Ads';
+  if (params.has('ttclid')) return 'TikTok';
+  if (params.has('msclkid')) return 'Bing Ads';
+
+  // 3. Fall back to document.referrer domain matching
+  if (referrer) {
+    const referrerPatterns: [RegExp, string][] = [
+      [/facebook\.com|fb\.com|fbwat\.ch|m\.facebook/, 'Facebook'],
+      [/instagram\.com|l\.instagram/, 'Instagram'],
+      [/tiktok\.com|vm\.tiktok/, 'TikTok'],
+      [/google\.(com|co|bd|com\.bd)/, 'Google'],
+      [/youtube\.com|youtu\.be/, 'YouTube'],
+      [/twitter\.com|x\.com|t\.co/, 'Twitter/X'],
+      [/linkedin\.com/, 'LinkedIn'],
+      [/whatsapp\.com|wa\.me/, 'WhatsApp'],
+      [/bing\.com/, 'Bing'],
+      [/pinterest\.com/, 'Pinterest'],
+    ];
+    for (const [pattern, sourceName] of referrerPatterns) {
+      if (pattern.test(referrer)) return sourceName;
+    }
+    // Unknown referrer — capture domain name
+    try {
+      const domain = new URL(document.referrer).hostname.replace('www.', '');
+      return `Referral (${domain})`;
+    } catch {
+      return 'Referral';
+    }
+  }
+
+  // 4. No referrer, no UTM = Direct visit
+  return 'Direct';
+}
+
 type ProductVariant = {
   id: string;
   name: string;
@@ -33,8 +98,13 @@ const CheckoutForm = ({ onSuccess }: { onSuccess?: () => void }) => {
   
   // IP capture for anti-fraud
   const customerIp = useRef<string | null>(null);
+  // Traffic source detection (captured once on page load)
+  const trafficSource = useRef<string>('Direct');
 
   useEffect(() => {
+    // Detect traffic source immediately (before referrer is lost)
+    trafficSource.current = detectTrafficSource();
+
     // Fetch customer IP silently on mount
     const fetchIp = async () => {
       try {
@@ -181,7 +251,8 @@ const CheckoutForm = ({ onSuccess }: { onSuccess?: () => void }) => {
           shipping_zone: shippingCost === 130 ? 'Outside dhaka' : 'Inside dhaka',
           source: 'stb-landing',
           status: 'New',
-          ip_address: customerIp.current || null
+          ip_address: customerIp.current || null,
+          traffic_source: trafficSource.current
         }
       ]);
 
