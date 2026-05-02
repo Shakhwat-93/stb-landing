@@ -20,7 +20,7 @@ const Pricing = () => {
           className="inline-flex items-center gap-2 px-4 py-2 bg-red-600/20 border border-red-500/50 text-red-100 rounded-full mb-8"
         >
           <Tag size={18} className="text-red-400" />
-          <span className="font-bold tracking-wider uppercase text-sm">Huge Mega Sale! ৪0% ছাড়</span>
+          <span className="font-bold tracking-wider uppercase text-sm">Huge Mega Sale! ৪৬% ছাড়</span>
         </motion.div>
 
         <h2 className="text-4xl md:text-5xl font-black mb-6 leading-tight">
@@ -58,7 +58,7 @@ const Pricing = () => {
                 <span className="text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-accent to-orange-400 drop-shadow-sm">
                   ১,৪৫০.০০৳
                 </span>
-                <span className="text-lg text-gray-400 bg-white/10 px-2 rounded font-bold">40% OFF</span>
+                <span className="text-lg text-gray-400 bg-white/10 px-2 rounded font-bold">46% OFF</span>
               </div>
             </div>
 
