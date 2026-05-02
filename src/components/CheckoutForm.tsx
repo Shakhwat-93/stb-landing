@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Lock, Plus, Minus, Check } from 'lucide-react';
 import heroImg from '../../assets/hero-desktop.webp';
 import blackImg from '../../assets/black-color.webp';
@@ -16,19 +16,44 @@ type ProductVariant = {
 };
 
 const productVariants: ProductVariant[] = [
-  { id: 'black', name: 'Canvas Travel Bag - Black', colorCode: '#111827', image: blackImg, price: 1350, inStock: true },
-  { id: 'blue', name: 'Canvas Travel Bag - Blue', colorCode: '#3b82f6', image: blueImg, price: 1350, inStock: false },
-  { id: 'beige', name: 'Canvas Travel Bag - Beige', colorCode: '#e8dbce', image: beigeImg, price: 1350, inStock: true },
+  { id: 'black', name: 'Canvas Travel Bag - Black', colorCode: '#111827', image: blackImg, price: 1450, inStock: true },
+  { id: 'blue', name: 'Canvas Travel Bag - Blue', colorCode: '#3b82f6', image: blueImg, price: 1450, inStock: false },
+  { id: 'beige', name: 'Canvas Travel Bag - Beige', colorCode: '#e8dbce', image: beigeImg, price: 1450, inStock: true },
 ];
 
 const CheckoutForm = ({ onSuccess }: { onSuccess?: () => void }) => {
   const [shippingCost, setShippingCost] = useState<number>(60);
   const [showLimitModal, setShowLimitModal] = useState(false);
+  const [showBlockedModal, setShowBlockedModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   const [name, setName] = useState('');
   const [address, setAddress] = useState('');
   const [phone, setPhone] = useState('');
+  
+  // IP capture for anti-fraud
+  const customerIp = useRef<string | null>(null);
+
+  useEffect(() => {
+    // Fetch customer IP silently on mount
+    const fetchIp = async () => {
+      try {
+        const res = await fetch('https://api.ipify.org?format=json');
+        const data = await res.json();
+        customerIp.current = data.ip || null;
+      } catch {
+        // Fallback: try alternative API
+        try {
+          const res = await fetch('https://ipinfo.io/json');
+          const data = await res.json();
+          customerIp.current = data.ip || null;
+        } catch {
+          customerIp.current = null;
+        }
+      }
+    };
+    fetchIp();
+  }, []);
   
   // State for cart: variant id -> quantity
   const [cart, setCart] = useState<Record<string, number>>({
@@ -83,7 +108,23 @@ const CheckoutForm = ({ onSuccess }: { onSuccess?: () => void }) => {
     setIsSubmitting(true);
     
     try {
-      // Rate Limit Check
+      // --- IP Block Check ---
+      if (customerIp.current) {
+        const { data: blockedIp } = await supabase
+          .from('blocked_ip_addresses')
+          .select('ip_address')
+          .eq('ip_address', customerIp.current)
+          .eq('is_active', true)
+          .limit(1);
+
+        if (blockedIp && blockedIp.length > 0) {
+          setShowBlockedModal(true);
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
+      // --- Rate Limit Check (Phone + IP) ---
       if (phone !== '01315183993') {
         const threeHoursAgo = new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString();
         
@@ -95,11 +136,23 @@ const CheckoutForm = ({ onSuccess }: { onSuccess?: () => void }) => {
           .gte('created_at', threeHoursAgo)
           .limit(1);
 
+        // Check DB for recent orders from the same IP
+        let ipRateLimited = false;
+        if (customerIp.current) {
+          const { data: recentIpOrders } = await supabase
+            .from('orders')
+            .select('id')
+            .eq('ip_address', customerIp.current)
+            .gte('created_at', threeHoursAgo)
+            .limit(1);
+          ipRateLimited = !!(recentIpOrders && recentIpOrders.length > 0);
+        }
+
         // Check local storage for recent orders from the same device
         const lastOrderTime = localStorage.getItem('last_order_time');
         const isRateLimitedByStorage = lastOrderTime && (Date.now() - parseInt(lastOrderTime)) < 3 * 60 * 60 * 1000;
 
-        if ((recentOrders && recentOrders.length > 0) || isRateLimitedByStorage) {
+        if ((recentOrders && recentOrders.length > 0) || isRateLimitedByStorage || ipRateLimited) {
            setShowLimitModal(true);
            setIsSubmitting(false);
            return;
@@ -127,7 +180,8 @@ const CheckoutForm = ({ onSuccess }: { onSuccess?: () => void }) => {
           items: totalItems,
           shipping_zone: shippingCost === 130 ? 'Outside dhaka' : 'Inside dhaka',
           source: 'stb-landing',
-          status: 'New'
+          status: 'New',
+          ip_address: customerIp.current || null
         }
       ]);
 
@@ -187,6 +241,26 @@ const CheckoutForm = ({ onSuccess }: { onSuccess?: () => void }) => {
         </div>
       )}
 
+      {/* Blocked IP Modal */}
+      {showBlockedModal && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full text-center">
+            <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">অর্ডার করা সম্ভব হচ্ছে না!</h3>
+            <p className="text-gray-600 mb-6 text-sm">
+              আপনার এই ডিভাইস/নেটওয়ার্ক থেকে অর্ডার করা সাময়িকভাবে বন্ধ রাখা হয়েছে। সমস্যা হলে আমাদের কল করুন: +8801942-212267
+            </p>
+            <button 
+              onClick={() => setShowBlockedModal(false)}
+              className="bg-gray-900 text-white font-bold py-3 px-8 rounded-md w-full hover:bg-gray-800 transition-colors"
+            >
+              বন্ধ করুন
+            </button>
+          </div>
+        </div>
+      )}
       <div className="max-w-5xl mx-auto px-4">
         <form onSubmit={handleSubmit}>
           

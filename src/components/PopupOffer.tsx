@@ -59,7 +59,7 @@ const PopupOffer = () => {
                   <div className="inline-flex items-center gap-1.5 bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-2">
                     <Gift size={14} /> Flash Sale
                   </div>
-                  <h3 className="text-white font-extrabold text-2xl leading-none">৫০% মেগা ডিসকাউন্ট!</h3>
+                  <h3 className="text-white font-extrabold text-2xl leading-none">৪০% মেগা ডিসকাউন্ট!</h3>
                 </div>
               </div>
 
@@ -68,8 +68,8 @@ const PopupOffer = () => {
                 <p className="text-gray-600 font-medium mb-6">আমাদের প্রিমিয়াম Canvas Travel Bag-এ চলছে সীমিত সময়ের অফার। এখনই লুফে নিন!</p>
                 
                 <div className="flex items-center justify-center gap-3 mb-8">
-                  <span className="text-gray-400 font-bold text-xl line-through decoration-red-500/50 decoration-2">২,৭০০৳</span>
-                  <span className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-accent to-orange-500">১,৩৫০৳</span>
+                  <span className="text-gray-400 font-bold text-xl line-through decoration-red-500/50 decoration-2">২,৪০০৳</span>
+                  <span className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-accent to-orange-500">১,৪৫০৳</span>
                 </div>
 
                 <button 

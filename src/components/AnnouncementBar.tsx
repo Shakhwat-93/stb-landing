@@ -9,7 +9,7 @@ const AnnouncementBar = () => {
       
       <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs md:text-sm font-bold tracking-wide text-center">
         <Sparkles size={16} className="text-yellow-300 animate-pulse hidden sm:block" />
-        <span className="leading-tight">🔥 বিশাল ধামাকা অফার: ২,৭০০৳ এর প্রিমিয়াম ট্রাভেল ব্যাগ এখন মাত্র <span className="text-yellow-300 text-base md:text-lg mx-1">১,৩৫০৳</span> (৫০% ছাড়!)</span>
+        <span className="leading-tight">🔥 বিশাল ধামাকা অফার: ২,৪০০৳ এর প্রিমিয়াম ট্রাভেল ব্যাগ এখন মাত্র <span className="text-yellow-300 text-base md:text-lg mx-1">১,৪৫০৳</span> (৪০% ছাড়!)</span>
         <Sparkles size={16} className="text-yellow-300 animate-pulse hidden sm:block" />
       </div>
     </div>

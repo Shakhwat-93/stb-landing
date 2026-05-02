@@ -20,11 +20,11 @@ function App() {
       event: "view_item",
       ecommerce: {
         currency: "BDT",
-        value: 1350,
+        value: 1450,
         items: [
           {
             item_name: "Canvas Travel Bag",
-            price: 1350,
+            price: 1450,
             quantity: 1
           }
         ]
