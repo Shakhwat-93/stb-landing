@@ -68,7 +68,7 @@ const PopupOffer = () => {
                 <p className="text-gray-600 font-medium mb-6">আমাদের প্রিমিয়াম Canvas Travel Bag-এ চলছে সীমিত সময়ের অফার। এখনই লুফে নিন!</p>
                 
                 <div className="flex items-center justify-center gap-3 mb-8">
-                  <span className="text-gray-400 font-bold text-xl line-through decoration-red-500/50 decoration-2">২,৪০০৳</span>
+                  <span className="text-gray-400 font-bold text-xl line-through decoration-red-500/50 decoration-2">২,৭০০৳</span>
                   <span className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-accent to-orange-500">১,৪৫০৳</span>
                 </div>
 

@@ -52,7 +52,7 @@ const Pricing = () => {
             {/* Price Box */}
             <div className="flex flex-col mb-8">
               <span className="text-red-400 font-bold text-xl line-through decoration-red-500/50 decoration-2">
-                ২,৪০০.০০৳
+                ২,৭০০.০০৳
               </span>
               <div className="flex items-baseline gap-2">
                 <span className="text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-accent to-orange-400 drop-shadow-sm">
