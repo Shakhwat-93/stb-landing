@@ -20,7 +20,10 @@ const Header = () => {
           <div className="w-8 h-8 bg-black text-white rounded-lg flex items-center justify-center font-bold">
             CB
           </div>
-          <span className="font-bold text-xl tracking-tight text-gray-900">Canvas Bag</span>
+          <div className="flex flex-col leading-tight">
+            <span className="font-bold text-xl tracking-tight text-gray-900">Canvas Bag</span>
+            <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Built for Traveller</span>
+          </div>
         </div>
 
         {/* Contact info - Hidden on very small screens */}

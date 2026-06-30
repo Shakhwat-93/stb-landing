@@ -64,11 +64,9 @@ const ProblemSolution = () => {
             </div>
             <ul className="space-y-4">
               {[
-                "স্মার্ট পকেট ডিজাইনে সব গুছানো",
-                "ইউনিক লেইন-আউটে কাপড় থাকে ভাঁজহীন",
-                "মাত্র ১.৫ কেজি, হালকা ও আরামদায়ক",
-                "১০০% ওয়াটারপ্রুফ ও স্ক্র্যাচ-রেজিস্ট্যান্ট",
-                "Airline Approved - অতিরিক্ত ফি থেকে মুক্তি"
+                "7 দিনের Trip-এর সবকিছু এক ব্যাগে।",
+                "হঠাৎ বৃষ্টিতেও Laptop, ক্যামেরা ও জামা কাপড় 100% নিরাপদ থাকবে।",
+                "Airline Approved — Extra Cabin Fee-এর ঝামেলা নেই।"
               ].map((item, idx) => (
                 <li key={idx} className="flex items-start gap-3 text-gray-800 font-semibold">
                   <CheckCircle2 size={20} className="text-green-500 shrink-0 mt-0.5" />

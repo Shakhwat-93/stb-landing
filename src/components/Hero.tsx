@@ -1,7 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import heroImg from '../../assets/hero-desktop.webp';
-import heroMobileImg from '../../assets/hero-mobile.webp';
+import heroImg from '../../assets/hero-new.jpeg';
 import { ArrowRight, PlaneTakeoff, ShieldCheck } from 'lucide-react';
 
 const Hero = () => {
@@ -18,14 +17,11 @@ const Hero = () => {
         transition={{ duration: 0.8 }}
         className="w-full"
       >
-        <picture>
-          <source media="(min-width: 768px)" srcSet={heroImg} />
-          <img 
-            src={heroMobileImg} 
-            alt="Canvas Travel Bag" 
-            className="w-full h-auto object-cover min-h-[300px] md:min-h-[500px] lg:min-h-screen"
-          />
-        </picture>
+        <img 
+          src={heroImg} 
+          alt="Canvas Travel Bag" 
+          className="w-full h-auto object-contain md:object-cover md:min-h-[500px] lg:min-h-screen"
+        />
       </motion.div>
 
       <div className="max-w-6xl mx-auto px-4 flex flex-col items-center py-12">
@@ -48,9 +44,9 @@ const Hero = () => {
             transition={{ duration: 0.5, delay: 0.4 }}
             className="text-2xl sm:text-3xl md:text-5xl font-extrabold text-gray-900 leading-tight break-words"
           >
-            Canvas Travel Bag – <br className="hidden md:block" />
+            ৩ দিনের ট্রিপ হোক বা Weekend Tour — <br className="hidden md:block" />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-orange-500">
-              এক ব্যাগেই ভ্রমণের সব সমাধান ✈️
+              একটি ব্যাগেই সব গুছিয়ে রাখুন ✈️
             </span>
           </motion.h1>
 
@@ -58,9 +54,9 @@ const Hero = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.5 }}
-            className="text-lg md:text-xl text-gray-600 max-w-2xl font-medium"
+            className="text-base md:text-xl text-gray-600 max-w-2xl font-medium leading-relaxed"
           >
-            হালকা, টেকসই, আর এয়ারলাইন-অ্যাপ্রুভড — এক ব্যাগেই প্যাক করুন পুরো ট্রিপের নিশ্চিন্ততা।
+            Airline Cabin Size Approved, 60 লিটার Capacity, Waterproof Oxford Fabric, মাত্র ১.৫ কেজি!
           </motion.p>
 
           <motion.div 
@@ -73,12 +69,27 @@ const Hero = () => {
               onClick={scrollToForm}
               className="w-full sm:w-auto bg-accent hover:bg-accent-hover text-white text-lg font-bold py-4 px-10 rounded-full shadow-lg hover:shadow-xl transition-all flex justify-center items-center gap-2 transform hover:-translate-y-1"
             >
-              <span>অর্ডার করতে চাই</span>
+              <span>এখনই অর্ডার করুন</span>
               <ArrowRight size={20} />
             </button>
             <div className="flex items-center gap-2 text-sm text-gray-500 font-medium">
               <ShieldCheck size={18} className="text-green-500" />
               <span>100% Quality Guaranteed</span>
+            </div>
+          </motion.div>
+
+          {/* Trust Badges */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.7 }}
+            className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6"
+          >
+            <div className="flex items-center gap-2 bg-green-50 border border-green-200 text-green-800 px-4 py-2.5 rounded-full text-sm font-bold">
+              ✅ Cash on Delivery
+            </div>
+            <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 text-blue-800 px-4 py-2.5 rounded-full text-sm font-bold">
+              ✅ ঢাকা 24-48 Hours Delivery
             </div>
           </motion.div>
 

@@ -472,7 +472,13 @@ const CheckoutForm = ({ onSuccess }: { onSuccess?: () => void }) => {
 
             {/* Right Column: Your Order */}
             <div className="w-full md:w-[45%]">
-               <h3 className="text-xl font-bold text-gray-900 mb-6 pb-2 border-b border-gray-200">Your order</h3>
+               <h3 className="text-xl font-bold text-gray-900 mb-4 pb-2 border-b border-gray-200">Your order</h3>
+
+               <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6">
+                 <p className="text-sm font-semibold text-green-800 leading-relaxed">
+                   🛡️ ডেলিভারির সময় ট্রাভেল ব্যাগটি চেক করে নিবেন, ব্যবহারের সময় কোন সমস্যা হলে <span className="font-extrabold text-green-900">7 দিনের মধ্যে রিপ্লেসমেন্ট</span> করে দেওয়া হবে!
+                 </p>
+               </div>
 
                <div className="flex justify-between items-center text-sm font-bold text-gray-800 mb-4 pb-2 border-b border-gray-100">
                  <span>Product</span>
