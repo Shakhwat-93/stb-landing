@@ -20,7 +20,8 @@ const Hero = () => {
         <img 
           src={heroImg} 
           alt="Canvas Travel Bag" 
-          className="w-full h-auto object-contain md:object-cover md:min-h-[500px] lg:min-h-screen"
+          onClick={scrollToForm}
+          className="w-full h-auto object-contain md:object-cover md:min-h-[500px] lg:min-h-screen cursor-pointer"
         />
       </motion.div>
 
