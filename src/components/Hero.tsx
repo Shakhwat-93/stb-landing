@@ -91,6 +91,9 @@ const Hero = () => {
             <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 text-blue-800 px-4 py-2.5 rounded-full text-sm font-bold">
               ✅ ঢাকায় ২৪-৪৮ ঘণ্টায় ডেলিভারি
             </div>
+            <div className="flex items-center gap-2 bg-purple-50 border border-purple-200 text-purple-800 px-4 py-2.5 rounded-full text-sm font-bold">
+              ✅ সারাদেশে 24-72 ঘন্টায় ডেলিভারি!
+            </div>
           </motion.div>
 
         </div>
