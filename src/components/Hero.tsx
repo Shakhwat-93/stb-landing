@@ -86,10 +86,10 @@ const Hero = () => {
             className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6"
           >
             <div className="flex items-center gap-2 bg-green-50 border border-green-200 text-green-800 px-4 py-2.5 rounded-full text-sm font-bold">
-              ✅ Cash on Delivery
+              ✅ ক্যাশ অন ডেলিভারি
             </div>
             <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 text-blue-800 px-4 py-2.5 rounded-full text-sm font-bold">
-              ✅ ঢাকা 24-48 Hours Delivery
+              ✅ ঢাকায় ২৪-৪৮ ঘণ্টায় ডেলিভারি
             </div>
           </motion.div>
 
