@@ -161,6 +161,81 @@ const CheckoutForm = ({ onSuccess }: { onSuccess?: () => void }) => {
   const productSubtotal = selectedItems.reduce((sum, item) => sum + (item.price * cart[item.id]), 0);
   const total = productSubtotal + shippingCost;
 
+  const incompleteOrderIdRef = useRef<string | null>(null);
+
+  const saveIncompleteOrder = async (currentName: string, currentPhone: string, currentAddress: string) => {
+    if (!currentPhone && !currentName) return;
+
+    const totalItems = selectedItems.reduce((sum, item) => sum + cart[item.id], 0);
+    const orderedItemsJson = selectedItems.map(item => ({
+      name: item.name,
+      quantity: cart[item.id],
+      price: item.price
+    }));
+
+    try {
+      if (!incompleteOrderIdRef.current) {
+        const newOrderId = `STB-${Math.floor(100000 + Math.random() * 900000)}`;
+        const { error } = await supabase
+          .from('orders')
+          .insert([
+            {
+              id: newOrderId,
+              customer_name: currentName || null,
+              phone: currentPhone || null,
+              address: currentAddress || null,
+              product_name: "Canvas Travel Bag",
+              ordered_items: orderedItemsJson,
+              amount: total,
+              items: totalItems,
+              shipping_zone: shippingCost === 130 ? 'Outside dhaka' : 'Inside dhaka',
+              source: 'stb-landing',
+              status: 'Incomplete',
+              ip_address: customerIp.current || null,
+              traffic_source: trafficSource.current
+            }
+          ]);
+
+        if (error) {
+          console.error("Error inserting incomplete order:", error);
+        } else {
+          incompleteOrderIdRef.current = newOrderId;
+        }
+      } else {
+        const { error } = await supabase
+          .from('orders')
+          .update({
+            customer_name: currentName || null,
+            phone: currentPhone || null,
+            address: currentAddress || null,
+            ordered_items: orderedItemsJson,
+            amount: total,
+            items: totalItems,
+            shipping_zone: shippingCost === 130 ? 'Outside dhaka' : 'Inside dhaka',
+            ip_address: customerIp.current || null,
+            traffic_source: trafficSource.current
+          })
+          .eq('id', incompleteOrderIdRef.current);
+
+        if (error) {
+          console.error("Error updating incomplete order:", error);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to save incomplete order:", err);
+    }
+  };
+
+  useEffect(() => {
+    if (!name && !phone && !address) return;
+
+    const timer = setTimeout(() => {
+      saveIncompleteOrder(name, phone, address);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [name, phone, address, cart, shippingCost]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (selectedItems.length === 0) {
@@ -236,25 +311,50 @@ const CheckoutForm = ({ onSuccess }: { onSuccess?: () => void }) => {
         price: item.price
       }));
       
-      const orderId = `STB-${Math.floor(100000 + Math.random() * 900000)}`;
+      let finalOrderId = incompleteOrderIdRef.current;
+      let error;
 
-      const { error } = await supabase.from('orders').insert([
-        {
-          id: orderId,
-          customer_name: name,
-          phone: phone,
-          address: address,
-          product_name: "Canvas Travel Bag",
-          ordered_items: orderedItemsJson,
-          amount: total,
-          items: totalItems,
-          shipping_zone: shippingCost === 130 ? 'Outside dhaka' : 'Inside dhaka',
-          source: 'stb-landing',
-          status: 'New',
-          ip_address: customerIp.current || null,
-          traffic_source: trafficSource.current
-        }
-      ]);
+      if (finalOrderId) {
+        const { error: updateError } = await supabase
+          .from('orders')
+          .update({
+            customer_name: name,
+            phone: phone,
+            address: address,
+            ordered_items: orderedItemsJson,
+            amount: total,
+            items: totalItems,
+            shipping_zone: shippingCost === 130 ? 'Outside dhaka' : 'Inside dhaka',
+            status: 'New',
+            ip_address: customerIp.current || null,
+            traffic_source: trafficSource.current,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', finalOrderId);
+
+        error = updateError;
+      } else {
+        finalOrderId = `STB-${Math.floor(100000 + Math.random() * 900000)}`;
+        const { error: insertError } = await supabase.from('orders').insert([
+          {
+            id: finalOrderId,
+            customer_name: name,
+            phone: phone,
+            address: address,
+            product_name: "Canvas Travel Bag",
+            ordered_items: orderedItemsJson,
+            amount: total,
+            items: totalItems,
+            shipping_zone: shippingCost === 130 ? 'Outside dhaka' : 'Inside dhaka',
+            source: 'stb-landing',
+            status: 'New',
+            ip_address: customerIp.current || null,
+            traffic_source: trafficSource.current
+          }
+        ]);
+
+        error = insertError;
+      }
 
       if (error) throw error;
       
@@ -264,7 +364,7 @@ const CheckoutForm = ({ onSuccess }: { onSuccess?: () => void }) => {
       w.dataLayer.push({
         event: "purchase",
         ecommerce: {
-          transaction_id: orderId,
+          transaction_id: finalOrderId,
           value: total,
           currency: "BDT",
           items: orderedItemsJson.map(item => ({
@@ -277,6 +377,8 @@ const CheckoutForm = ({ onSuccess }: { onSuccess?: () => void }) => {
         customer_phone: phone,
         customer_address: address
       });
+
+      incompleteOrderIdRef.current = null;
 
       localStorage.setItem('last_order_time', Date.now().toString());
       if (onSuccess) onSuccess();
@@ -435,6 +537,7 @@ const CheckoutForm = ({ onSuccess }: { onSuccess?: () => void }) => {
                     type="text" 
                     value={name}
                     onChange={(e) => setName(e.target.value)}
+                    onBlur={() => saveIncompleteOrder(name, phone, address)}
                     placeholder="e.g. Hasan Mahmud" 
                     className="w-full px-4 py-3 bg-white border border-gray-300 rounded focus:ring-1 focus:ring-gray-400 focus:border-gray-400 outline-none transition-colors" 
                   />
@@ -449,6 +552,7 @@ const CheckoutForm = ({ onSuccess }: { onSuccess?: () => void }) => {
                     type="text" 
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
+                    onBlur={() => saveIncompleteOrder(name, phone, address)}
                     placeholder="e.g. House 12, Road 4, Dhanmondi, Dhaka" 
                     className="w-full px-4 py-3 bg-white border border-gray-300 rounded focus:ring-1 focus:ring-gray-400 focus:border-gray-400 outline-none transition-colors" 
                   />
@@ -463,6 +567,7 @@ const CheckoutForm = ({ onSuccess }: { onSuccess?: () => void }) => {
                     type="tel" 
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
+                    onBlur={() => saveIncompleteOrder(name, phone, address)}
                     placeholder="01XXXXXXXXX" 
                     className="w-full px-4 py-3 bg-white border border-gray-300 rounded focus:ring-1 focus:ring-gray-400 focus:border-gray-400 outline-none transition-colors" 
                   />
