@@ -253,56 +253,7 @@ const CheckoutForm = ({ onSuccess }: { onSuccess?: () => void }) => {
     setIsSubmitting(true);
     
     try {
-      // --- IP Block Check ---
-      if (customerIp.current) {
-        const { data: blockedIp } = await supabase
-          .from('blocked_ip_addresses')
-          .select('ip_address')
-          .eq('ip_address', customerIp.current)
-          .eq('is_active', true)
-          .limit(1);
 
-        if (blockedIp && blockedIp.length > 0) {
-          setShowBlockedModal(true);
-          setIsSubmitting(false);
-          return;
-        }
-      }
-
-      // --- Rate Limit Check (Phone + IP) ---
-      if (phone !== '01315183993') {
-        const threeHoursAgo = new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString();
-        
-        // Check DB for recent orders with the same phone
-        const { data: recentOrders } = await supabase
-          .from('orders')
-          .select('id')
-          .eq('phone', phone)
-          .gte('created_at', threeHoursAgo)
-          .limit(1);
-
-        // Check DB for recent orders from the same IP
-        let ipRateLimited = false;
-        if (customerIp.current) {
-          const { data: recentIpOrders } = await supabase
-            .from('orders')
-            .select('id')
-            .eq('ip_address', customerIp.current)
-            .gte('created_at', threeHoursAgo)
-            .limit(1);
-          ipRateLimited = !!(recentIpOrders && recentIpOrders.length > 0);
-        }
-
-        // Check local storage for recent orders from the same device
-        const lastOrderTime = localStorage.getItem('last_order_time');
-        const isRateLimitedByStorage = lastOrderTime && (Date.now() - parseInt(lastOrderTime)) < 3 * 60 * 60 * 1000;
-
-        if ((recentOrders && recentOrders.length > 0) || isRateLimitedByStorage || ipRateLimited) {
-           setShowLimitModal(true);
-           setIsSubmitting(false);
-           return;
-        }
-      }
 
       const totalItems = selectedItems.reduce((sum, item) => sum + cart[item.id], 0);
       const orderedItemsJson = selectedItems.map(item => ({
